@@ -247,12 +247,14 @@ public class WarPlayerListener extends PlayerListener {
 						}
 						if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
 							Team team = zone.autoAssign(player);
-							event.setFrom(team.getTeamSpawn());
+							event.setTo(team.getTeamSpawn());
+                                                        event.setFrom(team.getTeamSpawn());
 							event.setCancelled(true);
 							if(war.getWarHub() != null) {
 								war.getWarHub().resetZoneSign(zone);
 							}
 						} else {
+							event.setTo(zone.getTeleport());
 							event.setFrom(zone.getTeleport());
 							player.teleport(zone.getTeleport());
 							event.setCancelled(true);
@@ -282,6 +284,7 @@ public class WarPlayerListener extends PlayerListener {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 							}
 						} else {
+							event.setTo(zone.getTeleport());
 							event.setFrom(zone.getTeleport());
 							player.teleport(zone.getTeleport());
 							event.setCancelled(true);
@@ -295,6 +298,7 @@ public class WarPlayerListener extends PlayerListener {
 				if (war.getWarHub() != null && zone.getLobby().isInWarHubLinkGate(playerLoc)){
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
+					event.setTo(war.getWarHub().getLocation());
 					event.setFrom(war.getWarHub().getLocation());
 					player.teleport(war.getWarHub().getLocation());
 					event.setCancelled(true);
@@ -311,6 +315,7 @@ public class WarPlayerListener extends PlayerListener {
 			Warzone zone = hub.getDestinationWarzoneForLocation(playerLoc);
 				if(zone != null && zone.getTeleport() != null) {
 					enteredGate = true;
+					event.setTo(zone.getTeleport());
 					event.setFrom(zone.getTeleport());
 							player.teleport(zone.getTeleport());
 					event.setCancelled(true);
@@ -325,6 +330,7 @@ public class WarPlayerListener extends PlayerListener {
 			// same as leave
 			Team playerTeam = war.getPlayerTeam(player.getName());
 			if(playerTeam != null) {
+				event.setTo(playerWarzone.getTeleport());
 				event.setFrom(playerWarzone.getTeleport());
 				playerWarzone.handlePlayerLeave(player, playerWarzone.getTeleport(), true);
 				event.setCancelled(true);
@@ -338,6 +344,7 @@ public class WarPlayerListener extends PlayerListener {
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
 			if(locZone == null && team != null) {;
 				war.badMsg(player, "You can't sneak out of a zone while in a team. Use /leave or walk out the lobby to exit the zone, please.");
+				event.setTo(team.getTeamSpawn());
 				event.setFrom(team.getTeamSpawn());
 				player.teleport(team.getTeamSpawn());
 				event.setCancelled(true);
@@ -382,6 +389,7 @@ public class WarPlayerListener extends PlayerListener {
 								playerWarzone.restorePlayerInventory(player);
 							}
 							playerWarzone.handleScoreCapReached(player, team.getName());
+							event.setTo(playerWarzone.getTeleport());
 							event.setFrom(playerWarzone.getTeleport());
 							player.teleport(playerWarzone.getTeleport());
 							event.setCancelled(true);
@@ -407,6 +415,7 @@ public class WarPlayerListener extends PlayerListener {
 				&&  !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) { 
 			// player is not in any team, but inside warzone boundaries, get him out
 			Warzone zone = war.warzone(playerLoc);
+			event.setTo(zone.getTeleport());
 			event.setFrom(zone.getTeleport());
 			player.teleport(zone.getTeleport());
 			event.setCancelled(true);
@@ -431,6 +440,7 @@ public class WarPlayerListener extends PlayerListener {
 	private void handleDisabledZone(PlayerMoveEvent event, Player player, Warzone zone) {
 		if(zone.getLobby() != null) {
 			war.badMsg(player, "This warzone is disabled.");
+			event.setTo(zone.getTeleport());
 			event.setFrom(zone.getTeleport());
 			player.teleport(zone.getTeleport());
 			event.setCancelled(true);
